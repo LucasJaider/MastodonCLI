@@ -74,7 +74,7 @@ func (m *model) ensureNotificationsLoaded() tea.Cmd {
 		return nil
 	}
 	view.loading = true
-	view.list.SetItems([]list.Item{loadingItem()})
+	view.list.SetItems([]list.Item{loadingItem("Loading notifications...", "Fetching notifications...")})
 	view.list.StartSpinner()
 	return tea.Batch(
 		fetchNotificationsCmd(m.client),
@@ -96,7 +96,7 @@ func (m *model) setNotifications(view *notificationsView, notifications []mastod
 	view.notifications = notifications
 	items := make([]list.Item, 0, components.Max(1, len(notifications)))
 	if len(notifications) == 0 {
-		items = append(items, emptyItem())
+		items = append(items, emptyItem("No notifications", "Nothing to show here yet."))
 	} else {
 		for _, item := range notifications {
 			items = append(items, notificationToItem(item, view.list.Width()))

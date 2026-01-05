@@ -54,7 +54,7 @@ func (m *model) ensureTimelineLoaded() tea.Cmd {
 		return nil
 	}
 	view.loading = true
-	view.list.SetItems([]list.Item{loadingItem()})
+	view.list.SetItems([]list.Item{loadingTimelineItem()})
 	view.list.StartSpinner()
 	return tea.Batch(
 		fetchTimelineCmd(m.client, m.activeTimeline, ""),

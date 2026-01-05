@@ -18,7 +18,7 @@ func (m *model) ensureProfileLoaded() tea.Cmd {
 		return nil
 	}
 	view.loading = true
-	view.list.SetItems([]list.Item{loadingItem()})
+	view.list.SetItems([]list.Item{loadingItem("Loading profile...", "Fetching latest statuses...")})
 	view.list.StartSpinner()
 	return tea.Batch(
 		fetchProfileCmd(m.client, m),

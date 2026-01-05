@@ -18,6 +18,7 @@ const (
 	tabTimeline topTab = iota
 	tabSearch
 	tabProfile
+	tabMetrics
 	tabNotifications
 )
 
@@ -28,6 +29,7 @@ type model struct {
 	timelineViews     map[timelineMode]*feedView
 	profileView       *feedView
 	notificationsView *notificationsView
+	metricsView       *metricsView
 	searchView        searchView
 	profileAccountID  string
 	spinner           spinner.Model
@@ -60,6 +62,7 @@ func newModel(client *mastodon.Client) model {
 	}
 
 	profile := newFeedView("Profile")
+	metricsView := newMetricsView("Metrics")
 	notifications := newNotificationsView("Notifications")
 	search := newSearchView()
 
@@ -69,6 +72,7 @@ func newModel(client *mastodon.Client) model {
 		activeTimeline:    modeHome,
 		timelineViews:     timelineViews,
 		profileView:       profile,
+		metricsView:       metricsView,
 		notificationsView: notifications,
 		searchView:        search,
 		spinner:           sp,
@@ -76,7 +80,7 @@ func newModel(client *mastodon.Client) model {
 }
 
 func (m model) Init() tea.Cmd {
-	m.timelineView().list.SetItems([]list.Item{loadingItem()})
+	m.timelineView().list.SetItems([]list.Item{loadingTimelineItem()})
 	m.timelineView().list.StartSpinner()
 	return tea.Batch(
 		fetchTimelineCmd(m.client, modeHome, ""),
@@ -135,6 +139,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, view.list.NewStatusMessage("No notifications returned.")
 		}
 		return m, view.list.NewStatusMessage(fmt.Sprintf("Loaded %d notifications.", len(msg.notifications)))
+	case metricsMsg:
+		view := m.metricsView
+		view.loading = false
+		view.list.StopSpinner()
+		view.progressActive = false
+		m.setMetrics(view, msg.series)
+		m.renderCurrentDetail()
+		if len(msg.series) == 0 {
+			return m, view.list.NewStatusMessage("No metrics returned.")
+		}
+		return m, view.list.NewStatusMessage(fmt.Sprintf("Loaded %d days.", len(msg.series)))
+	case metricsProgressMsg:
+		view := m.metricsView
+		if msg.complete {
+			view.progressActive = false
+			return m, nil
+		}
+		view.progressActive = true
+		view.progressDone = msg.done
+		view.progressTotal = msg.total
+		m.renderCurrentDetail()
+		if view.progressCh != nil {
+			return m, listenMetricsProgressCmd(view.progressCh)
+		}
+		return m, nil
 	case feedErrMsg:
 		if msg.tab == tabTimeline {
 			view := m.timelineViews[msg.mode]
@@ -152,6 +181,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			view := m.notificationsView
 			view.loading = false
 			view.list.StopSpinner()
+			return m, view.list.NewStatusMessage(fmt.Sprintf("Error: %v", msg.err))
+		}
+		if msg.tab == tabMetrics {
+			view := m.metricsView
+			view.loading = false
+			view.list.StopSpinner()
+			view.progressActive = false
 			return m, view.list.NewStatusMessage(fmt.Sprintf("Error: %v", msg.err))
 		}
 		return m, nil
@@ -183,13 +219,13 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "q", "ctrl+c":
 		return m, tea.Quit
 	case "tab":
-		m.activeTab = (m.activeTab + 1) % 4
+		m.activeTab = (m.activeTab + 1) % 5
 		m.resizeAll()
 		m.renderCurrentDetail()
 		m.renderSearch()
 		return m, m.ensureTabLoaded()
 	case "shift+tab":
-		m.activeTab = (m.activeTab + 3) % 4
+		m.activeTab = (m.activeTab + 4) % 5
 		m.resizeAll()
 		m.renderCurrentDetail()
 		m.renderSearch()
@@ -207,6 +243,12 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case "p":
 		m.activeTab = tabProfile
+		m.resizeAll()
+		m.renderCurrentDetail()
+		m.renderSearch()
+		return m, m.ensureTabLoaded()
+	case "m":
+		m.activeTab = tabMetrics
 		m.resizeAll()
 		m.renderCurrentDetail()
 		m.renderSearch()
@@ -239,6 +281,14 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "r":
 		return m.refreshCurrent()
+	case "7":
+		if m.activeTab == tabMetrics {
+			return m.switchMetricsRange(7)
+		}
+	case "3":
+		if m.activeTab == tabMetrics {
+			return m.switchMetricsRange(30)
+		}
 	}
 
 	return m.updateActiveView(msg)
@@ -273,12 +323,20 @@ func (m model) updateActiveView(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.renderCurrentDetail()
 		}
 		view.detail, _ = view.detail.Update(msg)
+	case tabMetrics:
+		view := m.metricsView
+		view.list, cmd = view.list.Update(msg)
+		if view.list.Index() != view.selected {
+			view.selected = view.list.Index()
+			m.renderCurrentDetail()
+		}
+		view.detail, _ = view.detail.Update(msg)
 	}
 	return m, cmd
 }
 
 func (m model) renderHeader() string {
-	tabs := []string{"Timeline", "Search", "Profile", "Notifications"}
+	tabs := []string{"Timeline", "Search", "Profile", "Metrics", "Notifications"}
 	var parts []string
 	for i, name := range tabs {
 		style := components.TabStyle
@@ -290,13 +348,18 @@ func (m model) renderHeader() string {
 	tabRow := lipgloss.JoinHorizontal(lipgloss.Top, parts...)
 	tabRow = components.HeaderStyle.Render(tabRow)
 
-	if m.activeTab != tabTimeline {
-		return tabRow
+	if m.activeTab == tabTimeline {
+		modeRow := m.renderTimelineModes()
+		modeRow = components.HeaderStyle.Render(modeRow)
+		return tabRow + "\n" + modeRow
+	}
+	if m.activeTab == tabMetrics {
+		modeRow := m.renderMetricsRanges()
+		modeRow = components.HeaderStyle.Render(modeRow)
+		return tabRow + "\n" + modeRow
 	}
 
-	modeRow := m.renderTimelineModes()
-	modeRow = components.HeaderStyle.Render(modeRow)
-	return tabRow + "\n" + modeRow
+	return tabRow
 }
 
 func (m model) renderContent() string {
@@ -307,6 +370,8 @@ func (m model) renderContent() string {
 		return m.renderFeed(m.profileView)
 	case tabSearch:
 		return m.searchView.viewport.View()
+	case tabMetrics:
+		return m.renderMetrics(m.metricsView)
 	case tabNotifications:
 		return m.renderNotifications(m.notificationsView)
 	default:
@@ -350,6 +415,8 @@ func (m *model) renderCurrentDetail() {
 		m.renderDetail(m.profileView)
 	case tabNotifications:
 		m.renderNotificationsDetail(m.notificationsView)
+	case tabMetrics:
+		m.renderMetricsDetail(m.metricsView)
 	}
 }
 
@@ -380,6 +447,7 @@ func (m *model) resizeAll() {
 	}
 	m.resizeFeed(m.profileView)
 	m.resizeNotifications(m.notificationsView)
+	m.resizeMetrics(m.metricsView)
 
 	height := m.contentHeight()
 	m.searchView.viewport.Width = m.width
@@ -412,7 +480,7 @@ func (m *model) resizeNotifications(view *notificationsView) {
 
 func (m *model) contentHeight() int {
 	headerLines := 1
-	if m.activeTab == tabTimeline {
+	if m.activeTab == tabTimeline || m.activeTab == tabMetrics {
 		headerLines = 2
 	}
 	return components.Max(5, m.height-headerLines)
@@ -430,6 +498,8 @@ func (m model) isLoading() bool {
 		return m.profileView.loading
 	case tabNotifications:
 		return m.notificationsView.loading
+	case tabMetrics:
+		return m.metricsView.loading
 	default:
 		return false
 	}
@@ -445,6 +515,8 @@ func (m *model) ensureTabLoaded() tea.Cmd {
 		return nil
 	case tabNotifications:
 		return m.ensureNotificationsLoaded()
+	case tabMetrics:
+		return m.ensureMetricsLoaded()
 	default:
 		return nil
 	}
@@ -483,6 +555,23 @@ func (m *model) refreshCurrent() (tea.Model, tea.Cmd) {
 		view.list.StartSpinner()
 		return m, tea.Batch(
 			fetchNotificationsCmd(m.client),
+			m.spinner.Tick,
+		)
+	case tabMetrics:
+		view := m.metricsView
+		if view.loading {
+			return m, nil
+		}
+		view.loading = true
+		view.progressActive = true
+		view.progressDone = 0
+		view.progressTotal = 0
+		view.list.StartSpinner()
+		progressCh := make(chan metricsProgressMsg, 4)
+		view.progressCh = progressCh
+		return m, tea.Batch(
+			fetchMetricsCmd(m.client, view.rangeDays, progressCh),
+			listenMetricsProgressCmd(progressCh),
 			m.spinner.Tick,
 		)
 	default:

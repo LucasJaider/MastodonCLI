@@ -9,6 +9,7 @@ import (
 
 	"mastodoncli/internal/config"
 	"mastodoncli/internal/mastodon"
+	"mastodoncli/internal/metrics"
 	"mastodoncli/internal/output"
 	"mastodoncli/internal/ui"
 )
@@ -28,6 +29,8 @@ func Run(args []string) error {
 		return runPosts(args[2:])
 	case "notifications":
 		return runNotifications(args[2:])
+	case "metrics":
+		return runMetrics(args[2:])
 	case "ui":
 		return runUI(args[2:])
 	case "help", "-h", "--help":
@@ -253,12 +256,50 @@ func runUI(args []string) error {
 	return ui.Run(client)
 }
 
+func runMetrics(args []string) error {
+	fs := flag.NewFlagSet("metrics", flag.ExitOnError)
+	rangeDays := fs.Int("range", 7, "Range in days (7 or 30)")
+	fs.Parse(args)
+
+	if *rangeDays != 7 && *rangeDays != 30 {
+		return fmt.Errorf("range must be 7 or 30")
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+	if cfg.Instance == "" || cfg.AccessToken == "" {
+		return fmt.Errorf("missing config; run `mastodon login --instance <domain>` first")
+	}
+
+	client := mastodon.NewClient(cfg.Instance, cfg.AccessToken)
+	showProgress := *rangeDays > 7
+	var lastScanned int
+	series, err := metrics.FetchDailyMetrics(client, *rangeDays, func(scanned int) {
+		lastScanned = scanned
+		if showProgress {
+			fmt.Fprintf(os.Stderr, "Scanned %d groups...\r", scanned)
+		}
+	})
+	if err != nil {
+		return err
+	}
+	if showProgress && lastScanned > 0 {
+		fmt.Fprintln(os.Stderr)
+	}
+
+	output.PrintDailyMetrics(series)
+	return nil
+}
+
 func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  mastodon login --instance <domain> [--force]")
 	fmt.Println("  mastodon timeline --limit <n> [--type home|local|federated|trending]")
 	fmt.Println("  mastodon posts --limit <n> [--boosts] [--replies]")
 	fmt.Println("  mastodon notifications --limit <n>")
+	fmt.Println("  mastodon metrics --range <7|30>")
 	fmt.Println("  mastodon ui")
 }
 

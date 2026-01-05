@@ -69,7 +69,7 @@ func (m *model) setStatuses(view *feedView, statuses []mastodon.Status) {
 	view.statuses = statuses
 	items := make([]list.Item, 0, components.Max(1, len(statuses)))
 	if len(statuses) == 0 {
-		items = append(items, emptyItem())
+		items = append(items, emptyTimelineItem())
 	} else {
 		for _, item := range statuses {
 			items = append(items, statusToItem(item, view.list.Width()))
@@ -167,16 +167,24 @@ func renderStatusDetail(item mastodon.Status, width int) string {
 	return builder.String()
 }
 
-func loadingItem() timelineItem {
+func loadingItem(title, snippet string) timelineItem {
 	return timelineItem{
-		title:   "Loading timeline...",
-		snippet: "Fetching latest statuses...",
+		title:   title,
+		snippet: snippet,
 	}
 }
 
-func emptyItem() timelineItem {
+func emptyItem(title, snippet string) timelineItem {
 	return timelineItem{
-		title:   "No statuses",
-		snippet: "Nothing to show here yet.",
+		title:   title,
+		snippet: snippet,
 	}
+}
+
+func loadingTimelineItem() timelineItem {
+	return loadingItem("Loading timeline...", "Fetching latest statuses...")
+}
+
+func emptyTimelineItem() timelineItem {
+	return emptyItem("No statuses", "Nothing to show here yet.")
 }

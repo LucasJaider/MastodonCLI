@@ -8,7 +8,7 @@ Minimal Go CLI and TUI for Mastodon. Supports OAuth login, timeline browsing, no
 
 - OAuth authorization code flow (OOB redirect)
 - CLI: home timeline and your own posts (with pagination up to 800)
-- TUI: timeline modes (Home/Local/Federated/Trending), notifications, profile, and a search placeholder
+- TUI: timeline modes (Home/Local/Federated/Trending), notifications, metrics, profile, and a search placeholder
 - Local config storage with secure permissions
 
 ## Installation
@@ -51,6 +51,13 @@ Fetch grouped notifications:
 ./mastodon notifications --limit 10
 ```
 
+Fetch engagement metrics:
+
+```bash
+./mastodon metrics --range 7
+./mastodon metrics --range 30
+```
+
 Show help:
 
 ```bash
@@ -66,8 +73,9 @@ Launch the TUI:
 ## TUI shortcuts
 
 - `tab` / `shift+tab`: switch top-level tabs
-- `t` / `s` / `p` / `n`: jump to Timeline / Search / Profile / Notifications
+- `t` / `s` / `p` / `m` / `n`: jump to Timeline / Search / Profile / Metrics / Notifications
 - Timeline modes: `h` (Home), `l` (Local), `f` (Federated), `g` (Trending), `r` (refresh)
+- Metrics ranges: `7` (7 days), `3` (30 days), `r` (refresh)
 
 ## Configuration
 
@@ -91,6 +99,8 @@ File permissions are set to `0600`.
   - Reads your own posts. By default boosts and replies are excluded. Supports pagination up to 800 posts and shows progress for larger requests.
 - `notifications --limit <n>`
   - Reads grouped notifications. `n` must be 1-40.
+- `metrics --range <7|30>`
+  - Aggregates follows/likes/boosts per day from notifications.
 - `ui`
   - Launches the TUI.
 
@@ -104,6 +114,7 @@ File permissions are set to `0600`.
 ./mastodon timeline --limit 5 --type trending
 ./mastodon posts --limit 5
 ./mastodon notifications --limit 5
+./mastodon metrics --range 7
 ./mastodon ui
 ```
 
