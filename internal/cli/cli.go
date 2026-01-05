@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 
 	"mastodoncli/internal/config"
 	"mastodoncli/internal/mastodon"
@@ -74,6 +76,9 @@ func runLogin(args []string) error {
 	fmt.Println("Open this URL in your browser and authorize the app:")
 	fmt.Println(authURL)
 	fmt.Println()
+	if err := openBrowser(authURL); err != nil {
+		fmt.Printf("Could not open browser automatically: %v\n", err)
+	}
 
 	code, err := prompt("Paste the authorization code: ")
 	if err != nil {
@@ -255,4 +260,15 @@ func printUsage() {
 	fmt.Println("  mastodon posts --limit <n> [--boosts] [--replies]")
 	fmt.Println("  mastodon notifications --limit <n>")
 	fmt.Println("  mastodon ui")
+}
+
+func openBrowser(url string) error {
+	switch runtime.GOOS {
+	case "darwin":
+		return exec.Command("open", url).Start()
+	case "windows":
+		return exec.Command("cmd", "/c", "start", url).Start()
+	default:
+		return exec.Command("xdg-open", url).Start()
+	}
 }
