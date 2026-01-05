@@ -122,7 +122,6 @@ func runTimeline(args []string) error {
 
 	client := mastodon.NewClient(cfg.Instance, cfg.AccessToken)
 	var statuses []mastodon.Status
-	var err error
 	switch *timelineType {
 	case "home":
 		statuses, err = client.HomeTimeline(*limit)
