@@ -100,10 +100,16 @@ func runLogin(args []string) error {
 func runTimeline(args []string) error {
 	fs := flag.NewFlagSet("timeline", flag.ExitOnError)
 	limit := fs.Int("limit", 20, "Number of statuses to fetch (1-40)")
+	timelineType := fs.String("type", "home", "Timeline type: home, local, federated, trending")
 	fs.Parse(args)
 
 	if *limit <= 0 || *limit > 40 {
 		return fmt.Errorf("limit must be between 1 and 40")
+	}
+	switch *timelineType {
+	case "home", "local", "federated", "trending":
+	default:
+		return fmt.Errorf("type must be one of: home, local, federated, trending")
 	}
 
 	cfg, err := config.Load()
@@ -115,7 +121,18 @@ func runTimeline(args []string) error {
 	}
 
 	client := mastodon.NewClient(cfg.Instance, cfg.AccessToken)
-	statuses, err := client.HomeTimeline(*limit)
+	var statuses []mastodon.Status
+	var err error
+	switch *timelineType {
+	case "home":
+		statuses, err = client.HomeTimeline(*limit)
+	case "local":
+		statuses, err = client.PublicTimelinePage(*limit, true, false, "", "")
+	case "federated":
+		statuses, err = client.PublicTimelinePage(*limit, false, false, "", "")
+	case "trending":
+		statuses, err = client.TrendingStatuses(*limit)
+	}
 	if err != nil {
 		return err
 	}
@@ -235,7 +252,7 @@ func runUI(args []string) error {
 func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  mastodon login --instance <domain> [--force]")
-	fmt.Println("  mastodon timeline --limit <n>")
+	fmt.Println("  mastodon timeline --limit <n> [--type home|local|federated|trending]")
 	fmt.Println("  mastodon posts --limit <n> [--boosts] [--replies]")
 	fmt.Println("  mastodon notifications --limit <n>")
 	fmt.Println("  mastodon ui")

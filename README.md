@@ -31,6 +31,14 @@ Fetch the latest posts from your home timeline:
 ./mastodon timeline --limit 10
 ```
 
+Fetch local, federated, or trending timelines:
+
+```bash
+./mastodon timeline --limit 10 --type local
+./mastodon timeline --limit 10 --type federated
+./mastodon timeline --limit 10 --type trending
+```
+
 Fetch your own posts:
 
 ```bash
@@ -77,8 +85,8 @@ File permissions are set to `0600`.
 - `login --instance <domain> [--force]`
   - Registers the OAuth app if needed, then prompts for the authorization code.
   - `--force` re-registers the app even if one is already stored.
-- `timeline --limit <n>`
-  - Reads the home timeline. `n` must be 1-40.
+- `timeline --limit <n> [--type home|local|federated|trending]`
+  - Reads a timeline. `n` must be 1-40.
 - `posts --limit <n> [--boosts] [--replies]`
   - Reads your own posts. By default boosts and replies are excluded. Supports pagination up to 800 posts and shows progress for larger requests.
 - `notifications --limit <n>`
@@ -90,7 +98,10 @@ File permissions are set to `0600`.
 
 ```bash
 ./mastodon login --instance mastodon.social
-./mastodon timeline --limit 5
+./mastodon timeline --limit 5 --type home
+./mastodon timeline --limit 5 --type local
+./mastodon timeline --limit 5 --type federated
+./mastodon timeline --limit 5 --type trending
 ./mastodon posts --limit 5
 ./mastodon notifications --limit 5
 ./mastodon ui
